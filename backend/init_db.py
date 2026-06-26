@@ -102,19 +102,24 @@ seed_data = [
 
 
 def init():
+    init_if_empty()
+def init_if_empty():
+    """only seed when db empty"""
     db = SessionLocal()
     try:
-        db.query(PriceTable).delete()
+        count = db.query(PriceTable).count()
+        if count > 0:
+            print(f"db has {count} records, skip")
+            return
         for item in seed_data:
             db.add(item)
         db.commit()
-        print(f"成功初始化 {len(seed_data)} 条价格数据")
+        print(f"seeded {len(seed_data)} records")
     except Exception as e:
         db.rollback()
-        print(f"初始化失败: {e}")
+        print(f"seed error: {e}")
     finally:
         db.close()
-
 
 if __name__ == "__main__":
     init()

@@ -3,11 +3,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from fastapi.staticfiles import StaticFiles
+from init_db import init_if_empty
 from routers import parse_config, calculate_price, submit_lead, admin
 from models import PriceTable, Lead  # noqa: ensure models are imported
 
 # 创建所有表
 Base.metadata.create_all(bind=engine)
+# auto seed on startup
+init_if_empty()
 
 app = FastAPI(
     title="电脑回收估价系统 API",

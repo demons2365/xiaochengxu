@@ -328,29 +328,20 @@ function filterType(el, type) {
   btns.forEach(function(b) { b.classList.remove("active"); });
   el.classList.add("active");
   var brandBar = document.getElementById("brandFilterBar");
-  if (type) {
-    var brands = [];
-    var seen = {};
-    allPrices.forEach(function(p) {
-      if (p.type === type) {
-        var b = getBrand(type, p.model);
-        if (b && !seen[b]) { seen[b] = true; brands.push(b); }
-      }
-    });
-    if (brands.length > 0) {
-      brandBar.style.display = "flex";
-      brandBar.innerHTML = '<span class="filter-btn active" data-brand="" onclick="filterBrand(this, \'\')">\u5168\u90e8</span>' +
-        brands.map(function(b) { return '<span class="filter-btn" data-brand="' + b + '" onclick="filterBrand(this, \'' + b + '\')">' + b + '</span>'; }).join("");
-    } else {
-      brandBar.style.display = "none";
-    }
+  var brandMap = {"cpu": ["AMD", "Intel"], "gpu": ["AMD", "Intel", "NVIDIA"], "ram": ["DDR3", "DDR4", "DDR5"], "ssd": ["M.2", "NVMe", "SATA"], "hdd": ["SATA"], "mb": ["AMD", "Intel"]};
+  var brands = brandMap[type] || [];
+  if (brands.length > 0) {
+    brandBar.style.display = "flex";
+    currentBrand = brands[0];
+    brandBar.innerHTML = brands.map(function(b, i) {
+      var cls = i === 0 ? "filter-btn active" : "filter-btn";
+      return '<span class="' + cls + '" data-brand="' + b + '" onclick="filterBrand(this, ' + "'" + b + "'" + ')">' + b + '</span>';
+    }).join("");
   } else {
     brandBar.style.display = "none";
   }
   renderPrices();
-}
-
-function filterBrand(el, brand) {
+}function filterBrand(el, brand) {
   currentBrand = brand;
   var btns = document.getElementById("brandFilterBar").querySelectorAll(".filter-btn");
   btns.forEach(function(b) { b.classList.remove("active"); });
@@ -361,27 +352,26 @@ function filterBrand(el, brand) {
 function getBrand(type, model) {
   var m = model.toUpperCase();
   if (type === "cpu") {
-    if (/^I[3-9]/.test(m)) return "Intel";
+    if (/^I[3-9]/.test(m) || /^ULTRA/.test(m)) return "Intel";
     if (/^R[3-9]/.test(m)) return "AMD";
-    return "\u5176\u4ed6";
+    return "";
   }
   if (type === "gpu") {
-    if (/^RTX/.test(m)) return "NVIDIA";
-    if (/^GTX/.test(m) || /^GT /.test(m)) return "NVIDIA";
+    if (/^RTX/.test(m) || /^GTX/.test(m) || /^GT ./.test(m)) return "NVIDIA";
     if (/^RX/.test(m)) return "AMD";
     if (/^ARC/.test(m)) return "Intel";
-    return "\u5176\u4ed6";
+    return "";
   }
   if (type === "ram") {
     if (/DDR3/.test(m)) return "DDR3";
     if (/DDR4/.test(m)) return "DDR4";
     if (/DDR5/.test(m)) return "DDR5";
-    return "\u5176\u4ed6";
+    return "";
   }
   if (type === "ssd") {
     if (/SATA/.test(m)) return "SATA";
     if (/NVME/.test(m)) return "NVMe";
-    return "\u5176\u4ed6";
+    return "";
   }
   if (type === "hdd") {
     return "SATA";
@@ -389,12 +379,10 @@ function getBrand(type, model) {
   if (type === "mb") {
     if (/^[HBZ]/.test(m)) return "Intel";
     if (/^[AX]/.test(m)) return "AMD";
-    return "\u5176\u4ed6";
+    return "";
   }
   return "";
-}
-
-function loadLeads() {
+}function loadLeads() {
   api("/admin/leads").then(function(r) {
     var tbody = document.getElementById("leadsTableBody");
     if (!r || r.length === 0) { tbody.innerHTML = "<tr><td colspan=\'7\' class=\'empty\'>暂无留资记录</td></tr>"; return; }
