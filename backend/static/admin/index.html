@@ -149,12 +149,16 @@ tr:hover { background: #0a0a30; }
           <h3>💰 回收价格库</h3>
           <button class="btn btn-primary" onclick="showAddPrice()">+ 新增</button>
         </div>
-        <div class="filter-bar" id="gpuFilterBar">
-          <span class="filter-btn active" data-brand="" onclick="filterGPU(this, '')">全部</span>
-          <span class="filter-btn" data-brand="nvidia" onclick="filterGPU(this, 'nvidia')">NVIDIA</span>
-          <span class="filter-btn" data-brand="amd" onclick="filterGPU(this, 'amd')">AMD</span>
-          <span class="filter-btn" data-brand="intel" onclick="filterGPU(this, 'intel')">Intel</span>
+        <div class="filter-bar" id="filterBar">
+          <span class="filter-btn active" data-type="" onclick="filterType(this, '')">全部</span>
+          <span class="filter-btn" data-type="cpu" onclick="filterType(this, 'cpu')">CPU</span>
+          <span class="filter-btn" data-type="gpu" onclick="filterType(this, 'gpu')">显卡</span>
+          <span class="filter-btn" data-type="ram" onclick="filterType(this, 'ram')">内存</span>
+          <span class="filter-btn" data-type="ssd" onclick="filterType(this, 'ssd')">固态</span>
+          <span class="filter-btn" data-type="hdd" onclick="filterType(this, 'hdd')">机械硬盘</span>
+          <span class="filter-btn" data-type="mb" onclick="filterType(this, 'mb')">主板</span>
         </div>
+        <div class="filter-bar" id="brandFilterBar" style="display:none"></div>
         <table>
           <thead><tr><th>类别</th><th>型号</th><th>价格</th><th>规格</th><th>操作</th></tr></thead>
           <tbody id="priceTableBody"><tr><td colspan="5" class="empty">加载中...</td></tr></tbody>
