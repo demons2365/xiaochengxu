@@ -41,7 +41,7 @@ def _send_server_chan(lead: Lead):
         ]
         desp = "\n".join(lines)
 
-        url = "https://sct.ftqq.com/" + SERVER_CHAN_KEY + ".send"
+        url = "https://sctapi.ftqq.com/" + SERVER_CHAN_KEY + ".send"
         httpx.post(url, data={"title": title, "desp": desp}, timeout=10)
     except Exception as e:
         print("ServerChan \u53d1\u9001\u5931\u8d25:", e)
