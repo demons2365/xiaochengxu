@@ -74,6 +74,18 @@ tr:hover { background: #0a0a30; }
 .form-group input:focus, .form-group select:focus { border-color: #0066ff; }
 .modal-btns { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
 
+/* GPU brand filter */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; background: #0a0a20; border: 1px solid #2a2a5a; color: #8888aa; }
+.filter-btn.active { background: #0066ff33; border-color: #0066ff; color: #66aaff; }
+.filter-btn:hover { border-color: #0066ff; }
+
+/* GPU brand filter */
+.filter-bar { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; background: #0a0a20; border: 1px solid #2a2a5a; color: #8888aa; }
+.filter-btn.active { background: #0066ff33; border-color: #0066ff; color: #66aaff; }
+.filter-btn:hover { border-color: #0066ff; }
+
 /* Error */
 .error-msg { color: #ff6666; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
 
@@ -136,6 +148,12 @@ tr:hover { background: #0a0a30; }
         <div class="card-header">
           <h3>💰 回收价格库</h3>
           <button class="btn btn-primary" onclick="showAddPrice()">+ 新增</button>
+        </div>
+        <div class="filter-bar" id="gpuFilterBar">
+          <span class="filter-btn active" data-brand="" onclick="filterGPU(this, '')">全部</span>
+          <span class="filter-btn" data-brand="nvidia" onclick="filterGPU(this, 'nvidia')">NVIDIA</span>
+          <span class="filter-btn" data-brand="amd" onclick="filterGPU(this, 'amd')">AMD</span>
+          <span class="filter-btn" data-brand="intel" onclick="filterGPU(this, 'intel')">Intel</span>
         </div>
         <table>
           <thead><tr><th>类别</th><th>型号</th><th>价格</th><th>规格</th><th>操作</th></tr></thead>
