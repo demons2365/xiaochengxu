@@ -34,6 +34,10 @@ class PriceEntryCreate(BaseModel):
     spec: str = ""
 
 
+class BulkPriceEntry(BaseModel):
+    entries: list[PriceEntryCreate]
+
+
 class PriceEntryUpdate(BaseModel):
     model: Optional[str] = None
     price: Optional[float] = None
@@ -76,6 +80,16 @@ def add_price(entry: PriceEntryCreate, db: Session = Depends(get_db), _=Depends(
     db.add(record)
     db.commit()
     return {"success": True, "id": record.id}
+@router.post("/price-table/bulk")
+def bulk_add_prices(bulk: BulkPriceEntry, db: Session = Depends(get_db), _=Depends(verify_token)):
+    db.query(PriceTable).delete()
+    for entry in bulk.entries:
+        record = PriceTable(type=entry.type, model=entry.model, price=entry.price, spec=entry.spec)
+        db.add(record)
+    db.commit()
+    count = db.query(PriceTable).count()
+    return {"success": True, "message": f"已导入 {len(bulk.entries)} 条数据", "total": count}
+
 
 
 @router.put("/price-table/{price_id}")
