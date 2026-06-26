@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from database import get_db
 from models import PriceTable, Lead
+from init_db import init_if_empty
 from pydantic import BaseModel
 from typing import Optional
 
