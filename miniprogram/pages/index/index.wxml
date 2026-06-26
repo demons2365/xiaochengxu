@@ -25,7 +25,7 @@
   <view class="card">
     <view class="card-title">📸 上传配置截图</view>
     <view class="upload-area" bindtap="onUploadImage">
-      <image class="upload-icon" src="../../images/upload.png" mode="aspectFit"></image>
+      <text class="upload-icon">+</text>
       <text class="upload-text">点击上传截图（OCR识别即将上线）</text>
     </view>
   </view>

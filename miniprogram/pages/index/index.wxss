@@ -88,8 +88,9 @@
   background: #0a0a30;
 }
 .upload-icon {
-  width: 48rpx;
-  height: 48rpx;
+  font-size: 64rpx;
+  color: #6666aa;
+  line-height: 1;
   margin-bottom: 10rpx;
 }
 .upload-text {

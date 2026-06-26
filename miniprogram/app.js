@@ -2,7 +2,6 @@ App({
   globalData: {
     parsedConfig: null,
     priceResult: null,
-    // 后端 API 地址（开发时用本地，上线后改服务器域名）
-    apiBaseUrl: 'https://flask-rj8k-274843-4-1447322442.sh.run.tcloudbase.com'
+    apiBaseUrl: 'https://xiaochengxu-274857-5-1315018620.sh.run.tcloudbase.com'
   }
 })

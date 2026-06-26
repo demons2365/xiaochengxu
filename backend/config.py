@@ -22,3 +22,8 @@ _MYSQL_DB = os.getenv("MYSQL_DATABASE") or os.getenv("MYSQL_INSTANCE_NAME", "rec
 
 if _MYSQL_HOST and _MYSQL_PASS and DATABASE_URL.startswith("sqlite"):
     DATABASE_URL = f"mysql+pymysql://{_MYSQL_USER}:{_MYSQL_PASS}@{_MYSQL_HOST}:{_MYSQL_PORT}/{_MYSQL_DB}?charset=utf8mb4"
+
+
+# Server酱 推送通知（可选）
+# 注册：https://sct.ftqq.com 获取 SendKey
+SERVER_CHAN_KEY = os.getenv("SERVER_CHAN_KEY", "")
