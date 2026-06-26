@@ -599,7 +599,6 @@ seed_data = [
 ]
 
 
-]
 
 
 def init_if_empty():
