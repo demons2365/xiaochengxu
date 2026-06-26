@@ -66,3 +66,19 @@ def api_submit_lead(req: SubmitLeadRequest, db: Session = Depends(get_db)):
     _send_server_chan(lead)
 
     return SubmitLeadResponse(success=True, message="\u63d0\u4ea4\u6210\u529f", lead_id=lead.id)
+
+
+
+@router.post("/test-serverchan")
+def test_serverchan():
+    """测试 Server酱 配置是否正确"""
+    import httpx
+    from config import SERVER_CHAN_KEY as key
+    if not key:
+        return {"success": False, "message": "SERVER_CHAN_KEY 未配置"}
+    try:
+        url = "https://sctapi.ftqq.com/" + key + ".send"
+        r = httpx.post(url, data={"title": "测试推送", "desp": "Server酱配置正确，推送正常"}, timeout=10)
+        return {"success": r.json().get("error") == "SUCCESS", "response": r.text[:300]}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
