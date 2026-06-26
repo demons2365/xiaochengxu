@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/result/result",
+    "pages/lead/lead"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0a0a1a",
+    "navigationBarTitleText": "电脑回收估价",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a0a1a"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

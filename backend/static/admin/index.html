@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回收估价管理系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
+.app { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* Login */
+.login-box { max-width: 360px; margin: 120px auto; background: linear-gradient(135deg, #12122a, #1a1a3a); border-radius: 16px; padding: 40px; border: 1px solid rgba(0,102,255,0.2); }
+.login-box h1 { text-align: center; font-size: 24px; margin-bottom: 8px; }
+.login-box p { text-align: center; color: #8888aa; font-size: 14px; margin-bottom: 24px; }
+.login-box input { width: 100%; height: 44px; background: #0a0a20; border: 1.5px solid #2a2a5a; border-radius: 10px; padding: 0 14px; color: #e0e0e0; font-size: 15px; outline: none; margin-bottom: 16px; }
+.login-box input:focus { border-color: #0066ff; }
+.login-box button { width: 100%; height: 44px; background: linear-gradient(135deg, #0066ff, #0055dd); border: none; border-radius: 22px; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.login-box button:active { opacity: 0.9; }
+.login-error { color: #ff6666; text-align: center; font-size: 14px; margin-top: 12px; display: none; }
+
+/* Header */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0 24px; }
+.header h1 { font-size: 22px; }
+.header .user-info { display: flex; align-items: center; gap: 16px; font-size: 14px; color: #8888aa; }
+.header .logout { color: #ff6666; cursor: pointer; }
+.header .logout:hover { color: #ff4444; }
+
+/* Nav */
+.nav { display: flex; gap: 8px; margin-bottom: 24px; }
+.nav-item { padding: 10px 20px; border-radius: 10px; cursor: pointer; font-size: 14px; background: #12122a; border: 1px solid #2a2a5a; color: #8888aa; }
+.nav-item.active { background: linear-gradient(135deg, #0066ff22, #00ccff22); border-color: #0066ff; color: #00ddff; }
+.nav-item:hover { border-color: #0066ff; }
+
+/* Cards */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: linear-gradient(135deg, #12122a, #1a1a3a); border-radius: 14px; padding: 24px; border: 1px solid rgba(0,102,255,0.15); }
+.stat-card .num { font-size: 36px; font-weight: 700; color: #00ddff; }
+.stat-card .label { font-size: 14px; color: #8888aa; margin-top: 4px; }
+
+/* Table */
+.card { background: linear-gradient(135deg, #12122a, #1a1a3a); border-radius: 14px; padding: 24px; border: 1px solid rgba(0,102,255,0.15); overflow-x: auto; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card-header h3 { font-size: 16px; }
+.btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
+.btn-primary { background: linear-gradient(135deg, #0066ff, #0055dd); color: #fff; }
+.btn-success { background: linear-gradient(135deg, #00aa66, #008855); color: #fff; }
+.btn-danger { background: #cc3333; color: #fff; }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-outline { background: transparent; border: 1px solid #2a2a5a; color: #8888aa; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #1a1a3a; }
+th { color: #8888cc; font-weight: 500; font-size: 12px; text-transform: uppercase; }
+td { color: #ccc; }
+tr:hover { background: #0a0a30; }
+.type-badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+.type-cpu { background: #0066ff22; color: #66aaff; }
+.type-gpu { background: #00aa6622; color: #66dd88; }
+.type-ram { background: #ffaa0022; color: #ffcc44; }
+.type-ssd { background: #cc44ff22; color: #cc88ff; }
+.type-hdd { background: #ff664422; color: #ff8866; }
+.price { color: #00ddff; font-weight: 600; }
+.price.zero { color: #ff6666; }
+.actions { display: flex; gap: 6px; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 100; }
+.modal-overlay.show { display: flex; }
+.modal { width: 480px; max-width: 90vw; background: #1a1a3a; border-radius: 16px; padding: 32px; border: 1px solid rgba(0,102,255,0.3); }
+.modal h3 { margin-bottom: 20px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 13px; color: #8888cc; margin-bottom: 4px; }
+.form-group input, .form-group select { width: 100%; height: 40px; background: #0a0a20; border: 1.5px solid #2a2a5a; border-radius: 8px; padding: 0 12px; color: #e0e0e0; font-size: 14px; outline: none; }
+.form-group input:focus, .form-group select:focus { border-color: #0066ff; }
+.modal-btns { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+/* Error */
+.error-msg { color: #ff6666; font-size: 13px; text-align: center; margin-top: 8px; display: none; }
+
+/* Toast */
+.toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; border-radius: 10px; color: #fff; font-size: 14px; z-index: 200; display: none; animation: fadeIn 0.3s; }
+.toast.success { background: #00aa66; }
+.toast.error { background: #cc3333; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px; color: #555577; }
+
+/* Leads detail */
+.lead-detail { font-size: 12px; color: #8888aa; }
+.lead-detail pre { background: #0a0a20; padding: 8px; border-radius: 6px; margin-top: 4px; font-size: 11px; max-height: 60px; overflow: auto; }
+.lead-time { font-size: 12px; color: #555577; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- Login -->
+  <div id="loginPage">
+    <div class="login-box">
+      <h1>🛡️ 后台管理</h1>
+      <p>电脑回收估价系统</p>
+      <input type="password" id="pwdInput" placeholder="请输入管理密码" onkeydown="if(event.key==='Enter')login()">
+      <button onclick="login()">登录</button>
+      <div class="login-error" id="loginError">密码错误</div>
+    </div>
+  </div>
+
+  <!-- Admin -->
+  <div id="adminPage" style="display:none">
+    <div class="header">
+      <h1>🛡️ 回收估价管理系统</h1>
+      <div class="user-info">
+        <span id="userInfo">已登录</span>
+        <span class="logout" onclick="logout()">退出</span>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-item active" onclick="switchTab('dashboard', this)">📊 概览</div>
+      <div class="nav-item" onclick="switchTab('prices', this)">💰 价格库</div>
+      <div class="nav-item" onclick="switchTab('leads', this)">📋 留资记录</div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="tabDashboard" class="tab-content">
+      <div class="stats">
+        <div class="stat-card"><div class="num" id="statPrices">-</div><div class="label">价格库条目</div></div>
+        <div class="stat-card"><div class="num" id="statTotalLeads">-</div><div class="label">总留资数</div></div>
+        <div class="stat-card"><div class="num" id="statTodayLeads">-</div><div class="label">今日留资</div></div>
+      </div>
+    </div>
+
+    <!-- Prices -->
+    <div id="tabPrices" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <h3>💰 回收价格库</h3>
+          <button class="btn btn-primary" onclick="showAddPrice()">+ 新增</button>
+        </div>
+        <table>
+          <thead><tr><th>类别</th><th>型号</th><th>价格</th><th>规格</th><th>操作</th></tr></thead>
+          <tbody id="priceTableBody"><tr><td colspan="5" class="empty">加载中...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Leads -->
+    <div id="tabLeads" class="tab-content" style="display:none">
+      <div class="card">
+        <div class="card-header">
+          <h3>📋 用户留资记录</h3>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>手机号</th><th>微信</th><th>配置</th><th>报价</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody id="leadsTableBody"><tr><td colspan="7" class="empty">加载中...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="priceModal">
+  <div class="modal">
+    <h3 id="modalTitle">新增价格</h3>
+    <div class="form-group">
+      <label>类别</label>
+      <select id="priceType"><option value="cpu">CPU</option><option value="gpu">GPU</option><option value="ram">内存</option><option value="ssd">固态硬盘</option><option value="hdd">机械硬盘</option></select>
+    </div>
+    <div class="form-group">
+      <label>型号</label>
+      <input id="priceModel" placeholder="例如：i5-12400F">
+    </div>
+    <div class="form-group">
+      <label>回收价（元）</label>
+      <input id="priceValue" type="number" step="1" placeholder="例如：450">
+    </div>
+    <div class="form-group">
+      <label>规格备注</label>
+      <input id="priceSpec" placeholder="例如：6核12线程">
+    </div>
+    <div class="error-msg" id="priceError">请填写完整信息</div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal()">取消</button>
+      <button class="btn btn-success" id="modalSaveBtn" onclick="savePrice()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+let token = localStorage.getItem("admin_token") || "";
+let editingId = null;
+const API_BASE = "";
+
+function showToast(msg, type) {
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast " + type;
+  t.style.display = "block";
+  setTimeout(function(){ t.style.display = "none"; }, 2500);
+}
+
+async function api(path, opts) {
+  opts = opts || {};
+  var headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = "Bearer " + token;
+  try {
+    var res = await fetch(API_BASE + path, { headers: headers, ...opts });
+    if (res.status === 401) { showToast("登录已过期，请重新登录", "error"); logout(); return null; }
+    return await res.json();
+  } catch(e) {
+    showToast("网络异常：" + e.message, "error");
+    return null;
+  }
+}
+
+function login() {
+  var pwd = document.getElementById("pwdInput").value;
+  api("/admin/login", { method: "POST", body: JSON.stringify({ password: pwd }) }).then(function(r) {
+    if (r && r.success) {
+      token = r.token;
+      localStorage.setItem("admin_token", token);
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("adminPage").style.display = "block";
+      loadData();
+    } else {
+      document.getElementById("loginError").style.display = "block";
+    }
+  });
+}
+
+function logout() {
+  token = "";
+  localStorage.removeItem("admin_token");
+  document.getElementById("adminPage").style.display = "none";
+  document.getElementById("loginPage").style.display = "block";
+  document.getElementById("pwdInput").value = "";
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll(".nav-item").forEach(function(e){ e.classList.remove("active"); });
+  el.classList.add("active");
+  document.querySelectorAll(".tab-content").forEach(function(e){ e.style.display = "none"; });
+  document.getElementById("tab" + name.charAt(0).toUpperCase() + name.slice(1)).style.display = "block";
+  if (name === "prices") loadPrices();
+  if (name === "leads") loadLeads();
+}
+
+function loadData() {
+  api("/admin/stats").then(function(r) {
+    if (r) {
+      document.getElementById("statPrices").textContent = r.total_prices;
+      document.getElementById("statTotalLeads").textContent = r.total_leads;
+      document.getElementById("statTodayLeads").textContent = r.today_leads;
+    }
+  });
+  loadPrices();
+  loadLeads();
+}
+
+function loadPrices() {
+  api("/admin/price-table").then(function(r) {
+    var tbody = document.getElementById("priceTableBody");
+    if (!r || r.length === 0) { tbody.innerHTML = "<tr><td colspan=\'5\' class=\'empty\'>暂无数据</td></tr>"; return; }
+    tbody.innerHTML = r.map(function(p) {
+      var badgeClass = "type-" + p.type;
+      return "<tr>" +
+        "<td><span class=\'type-badge " + badgeClass + "\'>" + p.type.toUpperCase() + "</span></td>" +
+        "<td>" + p.model + "</td>" +
+        "<td class=\'price" + (p.price === 0 ? " zero" : "") + "\'>¥" + p.price + "</td>" +
+        "<td style=\'color:#8888aa;font-size:13px\'>" + (p.spec || "") + "</td>" +
+        "<td class=\'actions\'>" +
+          "<button class=\'btn btn-sm btn-primary\' onclick=\'editPrice(" + JSON.stringify(p).replace(/"/g, "&quot;") + ")\'>编辑</button>" +
+          "<button class=\'btn btn-sm btn-danger\' onclick=\'deletePrice(" + p.id + ")\'>删除</button>" +
+        "</td></tr>";
+    }).join("");
+  });
+}
+
+function loadLeads() {
+  api("/admin/leads").then(function(r) {
+    var tbody = document.getElementById("leadsTableBody");
+    if (!r || r.length === 0) { tbody.innerHTML = "<tr><td colspan=\'7\' class=\'empty\'>暂无留资记录</td></tr>"; return; }
+    tbody.innerHTML = r.map(function(l) {
+      return "<tr>" +
+        "<td style=\'color:#555577\'>" + l.id + "</td>" +
+        "<td>" + l.phone + (l.wechat ? "<br><span style=\'font-size:12px;color:#8888aa\'>微信:" + l.wechat + "</span>" : "") + "</td>" +
+        "<td>" + (l.wechat || "-") + "</td>" +
+        "<td class=\'lead-detail\'>" + (l.config_text ? "<div>" + l.config_text + "</div>" : "") + "</td>" +
+        "<td class=\'price\'>¥" + l.price_total + "</td>" +
+        "<td class=\'lead-time\'>" + (l.create_time ? l.create_time.replace("T", " ").substring(0, 16) : "") + "</td>" +
+        "<td><button class=\'btn btn-sm btn-danger\' onclick=\'deleteLead(" + l.id + ")\'>删除</button></td>" +
+        "</tr>";
+    }).join("");
+  });
+}
+
+function showAddPrice() {
+  editingId = null;
+  document.getElementById("modalTitle").textContent = "新增价格";
+  document.getElementById("priceType").value = "cpu";
+  document.getElementById("priceModel").value = "";
+  document.getElementById("priceValue").value = "";
+  document.getElementById("priceSpec").value = "";
+  document.getElementById("priceError").style.display = "none";
+  document.getElementById("modalSaveBtn").textContent = "添加";
+  document.getElementById("priceModal").classList.add("show");
+}
+
+function editPrice(p) {
+  editingId = p.id;
+  document.getElementById("modalTitle").textContent = "编辑价格";
+  document.getElementById("priceType").value = p.type;
+  document.getElementById("priceModel").value = p.model;
+  document.getElementById("priceValue").value = p.price;
+  document.getElementById("priceSpec").value = p.spec || "";
+  document.getElementById("priceError").style.display = "none";
+  document.getElementById("modalSaveBtn").textContent = "保存";
+  document.getElementById("priceModal").classList.add("show");
+}
+
+function closeModal() {
+  document.getElementById("priceModal").classList.remove("show");
+}
+
+function savePrice() {
+  var type = document.getElementById("priceType").value;
+  var model = document.getElementById("priceModel").value.trim();
+  var price = parseFloat(document.getElementById("priceValue").value);
+  var spec = document.getElementById("priceSpec").value.trim();
+  if (!model || isNaN(price)) {
+    document.getElementById("priceError").style.display = "block";
+    return;
+  }
+  document.getElementById("priceError").style.display = "none";
+
+  var body = { type: type, model: model, price: price, spec: spec };
+  var url, method;
+  if (editingId) {
+    url = "/admin/price-table/" + editingId;
+    method = "PUT";
+  } else {
+    url = "/admin/price-table";
+    method = "POST";
+  }
+
+  api(url, { method: method, body: JSON.stringify(body) }).then(function(r) {
+    if (r && r.success) {
+      showToast(editingId ? "价格已更新" : "价格已添加", "success");
+      closeModal();
+      loadPrices();
+      loadData();
+    }
+  });
+}
+
+function deletePrice(id) {
+  if (!confirm("确定删除该价格记录吗？")) return;
+  api("/admin/price-table/" + id, { method: "DELETE" }).then(function(r) {
+    if (r && r.success) { showToast("已删除", "success"); loadPrices(); loadData(); }
+  });
+}
+
+function deleteLead(id) {
+  if (!confirm("确定删除该留资记录吗？")) return;
+  api("/admin/leads/" + id, { method: "DELETE" }).then(function(r) {
+    if (r && r.success) { showToast("已删除", "success"); loadLeads(); }
+  });
+}
+
+// Auto login if token exists
+if (token) {
+  api("/admin/stats").then(function(r) {
+    if (r) {
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("adminPage").style.display = "block";
+      loadData();
+    } else {
+      localStorage.removeItem("admin_token");
+    }
+  });
+}
+</script>
+</body>
+</html>

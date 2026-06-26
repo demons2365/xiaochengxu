@@ -1,0 +1,53 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <image class="logo" src="../../images/logo.png" mode="widthFix"></image>
+    <text class="title">电脑回收估价</text>
+    <text class="subtitle">输入配置，秒出报价</text>
+  </view>
+
+  <!-- 输入区 -->
+  <view class="card">
+    <view class="card-title">📋 输入电脑配置</view>
+    <textarea 
+      class="config-input" 
+      placeholder="例如：i5 12400F + RTX4060 + 16G DDR4 + 512G SSD&#10;或：i7 13700K 32G 1T固态 RTX4070Ti&#10;&#10;支持模糊输入，智能识别硬件型号" 
+      bindinput="onInput" 
+      value="{{configText}}"
+      maxlength="500"
+      auto-height
+    />
+    <view class="char-count">{{configText.length}} / 500</view>
+  </view>
+
+  <!-- 截图上传（占位） -->
+  <view class="card">
+    <view class="card-title">📸 上传配置截图</view>
+    <view class="upload-area" bindtap="onUploadImage">
+      <image class="upload-icon" src="../../images/upload.png" mode="aspectFit"></image>
+      <text class="upload-text">点击上传截图（OCR识别即将上线）</text>
+    </view>
+  </view>
+
+  <!-- 示例配置 -->
+  <view class="card">
+    <view class="card-title">💡 试试输入这些示例</view>
+    <view class="examples">
+      <view class="example-tag" bindtap="fillExample" data-text="i5 12400F + RTX4060 + 16G + 512G SSD">i5+4060+16G</view>
+      <view class="example-tag" bindtap="fillExample" data-text="R5 5600X + RX6750XT + 32G DDR4 + 1T SSD">A平台游戏</view>
+      <view class="example-tag" bindtap="fillExample" data-text="i7 13700K + RTX4080 + 32G DDR5 + 2T SSD">高端配置</view>
+      <view class="example-tag" bindtap="fillExample" data-text="i3 12100 + GTX1060 + 8G + 256G SSD">入门办公</view>
+    </view>
+  </view>
+
+  <!-- 估价按钮 -->
+  <button class="estimate-btn" bindtap="onEstimate" disabled="{{!canEstimate}}">
+    <text class="btn-text">🚀 立即估价</text>
+  </button>
+
+  <!-- 底部信息 -->
+  <view class="footer">
+    <text class="footer-text">AI 智能识别 · 实时报价 · 快速回收</text>
+  </view>
+</view>
