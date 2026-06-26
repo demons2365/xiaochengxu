@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+*.pyo
+.env
+*.db
+.git
+.gitignore
+README.md
+miniprogram/
+backend/__pycache__/
+backend/*.pyc
+backend/recycle.db
