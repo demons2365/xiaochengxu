@@ -10,7 +10,7 @@ from models import PriceTable, Lead  # noqa: ensure models are imported
 # 创建所有表
 Base.metadata.create_all(bind=engine)
 # auto seed on startup
-init_if_empty()
+init_if_empty()  # DEPLOY_V2
 
 app = FastAPI(
     title="电脑回收估价系统 API",
